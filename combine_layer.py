@@ -2,6 +2,25 @@ import keras
 import keras.backend as K
 
 class Combine(keras.layers.Layer):
+    """Combine layer
+
+    This layer recombines the output of its internal layers
+    
+    #Arguments
+    layers: A list of Keras layers
+    output_spec: A list of integer lists, indices from each layer in 'layers'
+        that make up each output coordinate
+    reduction: A string, the function to use between layer coordinates
+
+    #Example
+    To make a 3-element softmax binary tree:
+
+    output_spec = [[0, 0], [0, 1], [1, -1]]
+    comb = Combine([Dense(2, activation='softmax'),
+                    Dense(2, activation='softmax')],
+                    output_spec=output_spec,
+                    reduction='prod')
+    """
     def __init__(self, layers, output_spec, reduction='prod', **kwargs):
         self.layers = layers
         assert len(layers) > 0, "Must have layers in 'layers'"
