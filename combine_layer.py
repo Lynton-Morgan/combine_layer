@@ -76,3 +76,23 @@ class Combine(keras.layers.Layer):
         output_shape[-1] = self.output_dim
         return tuple(output_shape)
 
+    def get_config(self):
+        base_config = super(Combine, self).get_config()
+
+        config={}
+        config['layers'] = [{'class_name': layer.__class__.__name__,
+                        'config': layer.get_config()} for layer in self.layers]
+        config['output_spec'] = self.output_spec
+        config['reduction'] = self.reduction
+
+        return dict(list(base_config.items()) + list(config.items()))
+
+    @classmethod
+    def from_config(cls, config):
+        from keras.layers import deserialize as deserialize_layer
+
+        layers_config = config.pop('layers')
+        layers = [deserialize_layer(layers_config[i]) for i in range(len(layers_config))]
+
+        return cls(layers, **config)
+
